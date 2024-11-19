@@ -6,7 +6,7 @@ import br.pucpr.authserver.users.User
 
 data class StudentResponse (
     val id: Long,
-    val user: User,
+    val user: User
 
 ) {
     constructor(student: Student): this(

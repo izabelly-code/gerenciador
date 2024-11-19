@@ -19,60 +19,41 @@ class StudentService(
     private val Userepository: UserRepository,
     private val groupRepository: GroupRepository
 ) {
-//    fun insert(userId: Long,nameGroup:String): Student {
-//
-//        var student = repository.findByUserId(userId)
-//            //buscar em todos os estudantes se ja tem um usuario id igual ao passado
-//        if (student != null)
-//            throw IllegalArgumentException("Student already enrolled !")
-//
-//        else {
-//            //buscar o usuario no banco de dados de usuario
-//            val usuario = Userepository.findById(userId).orElseThrow { BadRequestException("User not found!") }
-//            val group =groupRepository.findByName(nameGroup) ?: throw BadRequestException("Group not found!")
-//            //preciso passar o plano especifico
-//
-//            student = Student(user = usuario, group = group)
-//            //buscar o plano
-//            return repository.save(student)
-//        }
-//    }
-fun insert(userId: Long, nameGroup: String): Student {
-    println("Iniciando inserção de estudante com userId: $userId e nameGroup: $nameGroup")
 
-    // Buscar se já existe um estudante com o mesmo userId
-    var student = repository.findByUserId(userId)
-    println("Resultado da busca por estudante existente: $student")
-    if (student != null) {
-        println("Erro: Estudante já está matriculado")
-        throw IllegalArgumentException("Student already enrolled!")
-    } else {
-        println("Estudante não encontrado, prosseguindo para buscar usuário.")
+    fun insert(userId: Long, nameGroup: String): Student? {
+        println("Iniciando inserção de estudante com userId: $userId e nameGroup: $nameGroup")
 
-        // Buscar usuário no banco de dados de usuários
-        val usuario = Userepository.findById(userId)
-        if (usuario.isEmpty) {
-            throw BadRequestException("User not found!")
+        // Buscar se já existe um estudante com o mesmo userId
+        var student = repository.findByUserId(userId)
+        println("Resultado da busca por estudante existente: $student")
+        if (student != null) {
+            throw IllegalArgumentException("Student already enrolled!")
+        } else {
+
+            // Buscar usuário no banco de dados de usuários
+            val usuario = Userepository.findById(userId)
+            if (usuario.isEmpty) {
+                throw BadRequestException("User not found!")
+            }
+            log.info("Usuário encontrado: $usuario")
+
+            // Buscar o grupo no banco de dados de grupos
+            val group = groupRepository.findByName(nameGroup) ?: run {
+                log.error("Erro: Grupo não encontrado para nameGroup: $nameGroup")
+                throw BadRequestException("Group not found!")
+            }
+            println("Grupo encontrado: $group")
+
+            // Criar o estudante
+            student = Student(user = usuario.get(), group = group)
+            println("Estudante criado com sucesso: $student")
+
+            // Salvar estudante no banco de dados
+            val savedStudent = repository.save(student)
+            log.info("Estudante salvo no banco de dados: $savedStudent")
+            return savedStudent
         }
-        log.info("Usuário encontrado: $usuario")
-
-        // Buscar o grupo no banco de dados de grupos
-        val group = groupRepository.findByName(nameGroup) ?: run {
-            println("Erro: Grupo não encontrado para nameGroup: $nameGroup")
-            throw BadRequestException("Group not found!")
-        }
-        println("Grupo encontrado: $group")
-
-        // Criar o estudante
-        student = Student(user = usuario, group = group)
-        println("Estudante criado com sucesso: $student")
-
-        // Salvar estudante no banco de dados
-        val savedStudent = repository.save(student)
-        println("Estudante salvo no banco de dados: $savedStudent")
-        return savedStudent
     }
-}
 
     //quero buscar o plano do grupo
     fun addPlan(plan:String , id: Long): Boolean {
@@ -103,6 +84,16 @@ fun insert(userId: Long, nameGroup: String): Student {
 
     fun findByGroup(groupName: String): List<Student>? {
         return repository.findByGroup(groupName)
+    }
+
+    fun update(id: Long): Student? {
+        log.info("Inside service")
+        var student = repository.findByIdOrNull(id)
+            ?: throw IllegalArgumentException("Student not found for id: $id")
+        student.group = null
+        repository.save(student)
+        log.info("Student $student exit group: ")
+        return student
     }
 
     companion object {

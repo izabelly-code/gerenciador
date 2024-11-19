@@ -59,6 +59,7 @@ class SecurityConfig(
             .authorizeHttpRequests { requests ->
                 requests
                     .requestMatchers(antMatcher(HttpMethod.GET)).permitAll()
+                    .requestMatchers(antMatcher(HttpMethod.PATCH)).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/users/login")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/users")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/students")).permitAll()

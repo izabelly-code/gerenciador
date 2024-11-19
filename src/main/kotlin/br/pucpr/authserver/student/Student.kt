@@ -22,6 +22,6 @@ class Student (
 
     @ManyToOne
     @JoinColumn(name = "group_id")
-    val group: Group? = null
+    var group: Group? = null
 
     )

@@ -2,6 +2,7 @@ package br.pucpr.authserver.student
 
 import br.pucpr.authserver.errors.BadRequestException
 import br.pucpr.authserver.errors.ForbiddenException
+import br.pucpr.authserver.group.response.GroupResponse
 import br.pucpr.authserver.security.UserToken
 import br.pucpr.authserver.student.requests.StudentRequest
 import br.pucpr.authserver.student.responses.StudentResponse
@@ -28,15 +29,29 @@ class StudentController (
     val service: StudentService,
     ) {
 
-        @PostMapping
-        fun insert(@RequestBody @Valid studentRequest: StudentRequest) {
-            val userId = studentRequest.userId
-            val nameGroup = studentRequest.nameGroup
-              service.insert(userId!!, nameGroup!!)
-                 .let { StudentResponse(it) }
-                 .let { ResponseEntity.status(CREATED).body(it) }
+    @PostMapping
+    fun insert(@RequestBody @Valid studentRequest: StudentRequest): ResponseEntity<StudentResponse> {
+        val userId = studentRequest.userId
+        val nameGroup = studentRequest.nameGroup
+        return service.insert(userId!!, nameGroup!!)
+            ?.let { StudentResponse(it) }
+            ?.let { ResponseEntity.status(CREATED).body(it) }
+            ?: ResponseEntity.noContent().build()
+    }
 
-        }
+    @PatchMapping("/{id}")
+    fun exitGroup(
+        @PathVariable id: Long,
+ //       auth: Authentication
+    ): ResponseEntity<StudentResponse> {
+ //       val token = auth.principal as? UserToken ?: throw ForbiddenException()
+  //      if (token.id != id ) throw ForbiddenException()
+        return service.update(id)
+            ?.let { StudentResponse(it) }
+            ?.let { ResponseEntity.ok(it) }
+            ?: ResponseEntity.noContent().build()
+    }
+
 
         @PutMapping("/{id}/plans/{plan}")
         fun addPlan(@PathVariable plan:String , @PathVariable id: Long) : ResponseEntity<Void> =
@@ -54,17 +69,13 @@ class StudentController (
                 ?: ResponseEntity.notFound().build()
 
 
-        @GetMapping("/{id}")
-        fun findByGroup(@PathVariable groupName:   String) =
+        @GetMapping("/{groupName}")
+        fun findByGroup(@PathVariable groupName : String) =
             service.findByGroup(groupName)
                 ?.map { StudentResponse(it) }
                 ?.let { ResponseEntity.ok(it) }
                 ?: ResponseEntity.notFound().build()
 
-//        @PutMapping("/{id}")
-//        fun exitGroup(@RequestBody id:Long) =
-//            service.exitGroup(id)
-//                .let { ResponseEntity.ok().build() }
-//                ?: ResponseEntity.notFound().build()
+
 
 }
