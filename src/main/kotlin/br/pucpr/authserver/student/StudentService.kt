@@ -21,11 +21,11 @@ class StudentService(
 ) {
 
     fun insert(userId: Long, nameGroup: String): Student? {
-        println("Iniciando inserção de estudante com userId: $userId e nameGroup: $nameGroup")
+        log.info("Iniciando inserção de estudante com userId: $userId e nameGroup: $nameGroup")
 
         // Buscar se já existe um estudante com o mesmo userId
         var student = repository.findByUserId(userId)
-        println("Resultado da busca por estudante existente: $student")
+        log.info("Resultado da busca por estudante existente: $student")
         if (student != null) {
             throw IllegalArgumentException("Student already enrolled!")
         } else {

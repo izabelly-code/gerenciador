@@ -7,7 +7,7 @@ import br.pucpr.authserver.users.User
 import jakarta.persistence.*
 
 @Entity
-@Table(name="tbStudent")
+@Table(name="student")
 class Student (
 
     @Id @GeneratedValue

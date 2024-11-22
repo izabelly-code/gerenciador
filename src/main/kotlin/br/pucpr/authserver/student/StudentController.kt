@@ -42,11 +42,8 @@ class StudentController (
     @PatchMapping("/{id}")
     fun exitGroup(
         @PathVariable id: Long,
- //       auth: Authentication
     ): ResponseEntity<StudentResponse> {
- //       val token = auth.principal as? UserToken ?: throw ForbiddenException()
-  //      if (token.id != id ) throw ForbiddenException()
-        return service.update(id)
+         return service.update(id)
             ?.let { StudentResponse(it) }
             ?.let { ResponseEntity.ok(it) }
             ?: ResponseEntity.noContent().build()
@@ -72,9 +69,9 @@ class StudentController (
         @GetMapping("/{groupName}")
         fun findByGroup(@PathVariable groupName : String) =
             service.findByGroup(groupName)
-                ?.map { StudentResponse(it) }
-                ?.let { ResponseEntity.ok(it) }
-                ?: ResponseEntity.notFound().build()
+            ?.map { StudentResponse(it) }
+            ?.let { ResponseEntity.ok(it) }
+            ?: ResponseEntity.notFound().build()
 
 
 

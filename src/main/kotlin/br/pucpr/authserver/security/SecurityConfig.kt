@@ -64,6 +64,7 @@ class SecurityConfig(
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/users")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/students")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/roles")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/drivers")).permitAll()
                     .requestMatchers(antMatcher("/h2-console/**")).permitAll()
                     .anyRequest().authenticated()
             }.addFilterAfter(jwtFilter, BasicAuthenticationFilter::class.java)
